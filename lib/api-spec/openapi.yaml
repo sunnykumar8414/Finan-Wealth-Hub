@@ -3,13 +3,23 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: FINAN Finance Management API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: expenses
+    description: Expense management
+  - name: investments
+    description: Investment portfolio management
+  - name: transactions
+    description: Transaction history
+  - name: dashboard
+    description: Dashboard summaries and analytics
+  - name: budgets
+    description: Budget management
 paths:
   /healthz:
     get:
@@ -24,6 +34,292 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /expenses:
+    get:
+      operationId: listExpenses
+      tags: [expenses]
+      summary: List all expenses
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: month
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of expenses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Expense"
+    post:
+      operationId: createExpense
+      tags: [expenses]
+      summary: Create a new expense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExpenseInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Expense"
+
+  /expenses/{id}:
+    get:
+      operationId: getExpense
+      tags: [expenses]
+      summary: Get a specific expense
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Expense found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Expense"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateExpense
+      tags: [expenses]
+      summary: Update an expense
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExpenseUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Expense"
+    delete:
+      operationId: deleteExpense
+      tags: [expenses]
+      summary: Delete an expense
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /investments:
+    get:
+      operationId: listInvestments
+      tags: [investments]
+      summary: List all investments
+      responses:
+        "200":
+          description: List of investments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Investment"
+    post:
+      operationId: createInvestment
+      tags: [investments]
+      summary: Create a new investment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvestmentInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Investment"
+
+  /investments/{id}:
+    patch:
+      operationId: updateInvestment
+      tags: [investments]
+      summary: Update an investment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvestmentUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Investment"
+    delete:
+      operationId: deleteInvestment
+      tags: [investments]
+      summary: Delete an investment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /transactions:
+    get:
+      operationId: listTransactions
+      tags: [transactions]
+      summary: List recent transactions
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: type
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+
+  /budgets:
+    get:
+      operationId: listBudgets
+      tags: [budgets]
+      summary: List all budgets
+      responses:
+        "200":
+          description: List of budgets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Budget"
+    post:
+      operationId: createBudget
+      tags: [budgets]
+      summary: Create a budget
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BudgetInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Budget"
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get financial summary for dashboard
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /dashboard/spending-by-category:
+    get:
+      operationId: getSpendingByCategory
+      tags: [dashboard]
+      summary: Spending breakdown by category
+      parameters:
+        - name: month
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Spending by category
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CategorySpending"
+
+  /dashboard/monthly-trend:
+    get:
+      operationId: getMonthlyTrend
+      tags: [dashboard]
+      summary: Monthly income vs expenses trend
+      responses:
+        "200":
+          description: Monthly trend data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MonthlyTrend"
+
+  /dashboard/portfolio-performance:
+    get:
+      operationId: getPortfolioPerformance
+      tags: [dashboard]
+      summary: Investment portfolio performance over time
+      responses:
+        "200":
+          description: Portfolio performance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortfolioPerformance"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +330,254 @@ components:
       required:
         - status
 
+    Expense:
+      type: object
+      required: [id, title, amount, category, date, type]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        amount:
+          type: number
+        category:
+          type: string
+        date:
+          type: string
+        type:
+          type: string
+          enum: [expense, income]
+        note:
+          type: ["string", "null"]
+
+    ExpenseInput:
+      type: object
+      required: [title, amount, category, date, type]
+      properties:
+        title:
+          type: string
+        amount:
+          type: number
+        category:
+          type: string
+        date:
+          type: string
+        type:
+          type: string
+          enum: [expense, income]
+        note:
+          type: string
+
+    ExpenseUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        amount:
+          type: number
+        category:
+          type: string
+        date:
+          type: string
+        type:
+          type: string
+          enum: [expense, income]
+        note:
+          type: string
+
+    Investment:
+      type: object
+      required: [id, name, ticker, shares, purchasePrice, currentPrice, type]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        ticker:
+          type: string
+        shares:
+          type: number
+        purchasePrice:
+          type: number
+        currentPrice:
+          type: number
+        type:
+          type: string
+          enum: [stock, etf, crypto, bond, mutual_fund]
+        sector:
+          type: ["string", "null"]
+        allocationPercent:
+          type: number
+
+    InvestmentInput:
+      type: object
+      required: [name, ticker, shares, purchasePrice, currentPrice, type]
+      properties:
+        name:
+          type: string
+        ticker:
+          type: string
+        shares:
+          type: number
+        purchasePrice:
+          type: number
+        currentPrice:
+          type: number
+        type:
+          type: string
+          enum: [stock, etf, crypto, bond, mutual_fund]
+        sector:
+          type: string
+
+    InvestmentUpdate:
+      type: object
+      properties:
+        shares:
+          type: number
+        currentPrice:
+          type: number
+        sector:
+          type: string
+
+    Transaction:
+      type: object
+      required: [id, title, amount, type, category, date, status]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        amount:
+          type: number
+        type:
+          type: string
+          enum: [credit, debit]
+        category:
+          type: string
+        date:
+          type: string
+        status:
+          type: string
+          enum: [completed, pending, failed]
+        icon:
+          type: ["string", "null"]
+
+    Budget:
+      type: object
+      required: [id, category, limit, spent, month]
+      properties:
+        id:
+          type: integer
+        category:
+          type: string
+        limit:
+          type: number
+        spent:
+          type: number
+        month:
+          type: string
+        color:
+          type: ["string", "null"]
+
+    BudgetInput:
+      type: object
+      required: [category, limit, month]
+      properties:
+        category:
+          type: string
+        limit:
+          type: number
+        month:
+          type: string
+        color:
+          type: string
+
+    DashboardSummary:
+      type: object
+      required: [totalBalance, totalExpenses, totalIncome, totalInvestments, savingsRate, monthlyChange]
+      properties:
+        totalBalance:
+          type: number
+        totalExpenses:
+          type: number
+        totalIncome:
+          type: number
+        totalInvestments:
+          type: number
+        savingsRate:
+          type: number
+        monthlyChange:
+          type: number
+        investmentGain:
+          type: number
+        investmentGainPercent:
+          type: number
+
+    CategorySpending:
+      type: object
+      required: [category, amount, percent, color]
+      properties:
+        category:
+          type: string
+        amount:
+          type: number
+        percent:
+          type: number
+        color:
+          type: string
+
+    MonthlyTrend:
+      type: object
+      required: [month, income, expenses, savings]
+      properties:
+        month:
+          type: string
+        income:
+          type: number
+        expenses:
+          type: number
+        savings:
+          type: number
+
+    PortfolioPerformance:
+      type: object
+      required: [totalValue, totalCost, totalGain, totalGainPercent, history]
+      properties:
+        totalValue:
+          type: number
+        totalCost:
+          type: number
+        totalGain:
+          type: number
+        totalGainPercent:
+          type: number
+        history:
+          type: array
+          items:
+            $ref: "#/components/schemas/PortfolioSnapshot"
+        allocation:
+          type: array
+          items:
+            $ref: "#/components/schemas/AllocationItem"
+
+    PortfolioSnapshot:
+      type: object
+      required: [date, value]
+      properties:
+        date:
+          type: string
+        value:
+          type: number
+
+    AllocationItem:
+      type: object
+      required: [type, percent, value, color]
+      properties:
+        type:
+          type: string
+        percent:
+          type: number
+        value:
+          type: number
+        color:
+          type: string
